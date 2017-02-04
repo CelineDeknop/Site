@@ -1,0 +1,73 @@
+<%include ./header%>
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Votre CV
+                        </h1>
+                       	<%if(CV){%>
+                            <p>
+                            Nom, prénom : <%= user[0].FirstName%>, <%= user[0].LastName%> </br>
+                            Email : <%= user[0].Email%> </br>
+                            Téléphone : <%= CV[0].Phone%> </br>
+                            Adresse : <%= CV[0].Address%> </br>
+                            Date de naissance : <%= CV[0].Birth%> </br>
+                            </p>
+                            <p>
+                            Formations : </br>
+                            <%if(form.length == 0){%>
+                                Vous n'avez pas encore ajouté de formations.
+                            <%}%>
+                            <%if(form.length != 0){%>
+                                <%form.forEach(function(el){%>
+                                    De <%=  moment(el.DateStart).format("DD-MM-YYYY") %> à <%= moment(el.DateEnd).format("DD-MM-YYYY") %> </br>
+                                    <%= el.Description %>
+                                <%});%>
+                            <%}%>
+                            </p>
+                            <p>
+                            Expériences professionnelles : </br>
+                            <%if(exp.length == 0){%>
+                                Vous n'avez pas encore ajouté d'expériences.
+                            <%}%>
+                            <%if(exp.length != 0){%>
+                                <%exp.forEach(function(el){%>
+                                    <p>
+                                    De <%= moment(el.DateStart).format("DD-MM-YYYY") %> à <%= moment(el.DateEnd).format("DD-MM-YYYY") %> </br>
+                                    <%= el.Description %> </br>
+                                    <%if(el.Remarque != null){%>
+                                        Remarque : <%= el.Remarque%> </br>
+                                    <%}%>
+                                    </p>
+                                <%});%>
+                            <%}%>
+                            </p>
+                        <%}%>
+                        <%if(!CV){%>
+                            Vous n'avez pas encore entré les informations de votre CV. Cliquez <a href=/creerCV> ici </a> pour en créer un.
+                        <%}%>
+                        <button class="btn btn-default">Modifier</button> <button class="btn btn-default">Exporter en PDF</button>
+                    </div>
+                </div>
+                <!-- /.row -->
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
