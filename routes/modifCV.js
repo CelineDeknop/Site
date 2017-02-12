@@ -5,14 +5,46 @@ var app     = express.Router();
 var sqlite3 = require("sqlite3").verbose();
 var file = "DadSite.sqlite";
 var db = new sqlite3.Database(file);
+var mom = require("momentjs");
 
 app.get('/', function(req, res) {
-  	res.render('creerCV', {
-		titre:'CV',
-		user:req.user,
-		badbirth:false,
-		previous:undefined
-	});
+    if(!req.user){//If the user is not connected, he souldn't be here
+        res.redirect("/connexion");
+        return;
+    }
+    var request1 = "SELECT * FROM CV WHERE UserID = " + req.user[0].User_ID +" ;";
+    db.all(request1, function(err, CVdata){//Get the CV
+        if(CVdata[0]){//If we got a CV, fetch the formations & experiences
+            var request2 = "SELECT * FROM FORMATION WHERE CVID = "+CVdata[0].CV_ID;
+            db.all(request2, function(err2, formData){//Get the formations
+                var request3 = "SELECT * FROM EXPERIENCE WHERE CVID = " +CVdata[0].CV_ID;
+                db.all(request3, function(err3, expData){//Get the experiences
+                    console.log(formData);
+                    res.render('modifCV', {
+                        titre:'CV',
+                        user:req.user,
+                        CV:CVdata,
+                        form:formData,
+                        exp:expData,
+                        moment:mom,
+                        badbirth:false,
+                        previous:undefined
+                    });
+                });
+            });
+        }
+        else{
+            res.render('modifCV', {
+                titre:'CV',
+                user:req.user,
+                CV:undefined,
+                form:undefined,
+                exp:undefined,
+                badbirth:false,
+                previous:undefined
+            });
+        }
+    });
 });
 
 app.post('/', function(req, res, next) {
@@ -28,7 +60,7 @@ app.post('/', function(req, res, next) {
 	}
 	else{
 		//Birthdate invalid
-		res.render('creerCV', {
+		res.render('modifCV', {
 			titre:'CV',
 			user:req.user,
 			badbirth:true,
@@ -44,8 +76,7 @@ app.post('/', function(req, res, next) {
 
 	//Do db inserts
 	db.run("BEGIN TRANSACTION");
-	db.run("INSERT INTO CV (UserID, Phone, Address, Birth) VALUES (?,?,?,?)",
-                    [req.user[0].User_ID, phone, address, birth], 
+	db.run("UPDATE CV SET Phone='"+phone+"', Address='"+address+"', Birth ='"+birth+"' WHERE UserID = "+req.user[0].User_ID , 
     function callback(){
     	db.run("END"); //Assured the CV is inserted
     	var request = "SELECT CV_ID FROM CV WHERE UserID = " + req.user[0].User_ID+" ;";
@@ -72,7 +103,7 @@ app.post('/', function(req, res, next) {
     				try{//Try to make the date and insert
     					var dateStart = new  Date(dateSplit[2].trim()+'-'+ dateSplit[1].trim() + '-' + dateSplit[0].trim()).toISOString().slice(0, 19).replace('T', ' ');
     					var dateEnd = new  Date(dateSplit[5].trim()+'-'+ dateSplit[4].trim() + '-' + dateSplit[3].trim()).toISOString().slice(0, 19).replace('T', ' ');
-    					db.run("INSERT INTO FORMATION (CVID, DateStart, DateEnd, Description) VALUES (?,?,?,?)",
+    					db.run("INSERT OR REPLACE INTO FORMATION (CVID, DateStart, DateEnd, Description) VALUES (?,?,?,?)",
                    			[data[0].CV_ID, dateStart, dateEnd, desc]);//Encoded formation
     				}
     				catch(err){
@@ -107,7 +138,7 @@ app.post('/', function(req, res, next) {
     				try{//Try to make the dates and insert
     					var dateStart = new  Date(dateSplit[2].trim()+'-'+ dateSplit[1].trim() + '-' + dateSplit[0].trim()).toISOString().slice(0, 19).replace('T', ' ');
     					var dateEnd = new  Date(dateSplit[5].trim()+'-'+ dateSplit[4].trim() + '-' + dateSplit[3].trim()).toISOString().slice(0, 19).replace('T', ' ');
-    					db.run("INSERT INTO EXPERIENCE (CVID, DateStart, DateEnd, Description, Remarque) VALUES (?,?,?,?,?)",
+    					db.run("INSERT OR REPLACE INTO EXPERIENCE (CVID, DateStart, DateEnd, Description, Remarque) VALUES (?,?,?,?,?)",
                    			[data[0].CV_ID, dateStart, dateEnd, desc, rem]);//Encoded experience
     				}
     				catch(err){
@@ -120,6 +151,7 @@ app.post('/', function(req, res, next) {
             });
     	});
 	});
+	
 });
 
 module.exports = app;

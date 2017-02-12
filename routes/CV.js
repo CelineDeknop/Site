@@ -20,9 +20,6 @@ app.get('/', function(req, res) {
   			db.all(request2, function(err2, formData){//Get the formations
   				var request3 = "SELECT * FROM EXPERIENCE WHERE CVID = " +CVdata[0].CV_ID;
   				db.all(request3, function(err3, expData){//Get the experiences
-  					console.log(CVdata);
-  					console.log(formData);
-  					console.log(expData);
   					res.render('CV', {
 						titre:'CV',
 						user:req.user,

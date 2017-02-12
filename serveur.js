@@ -164,6 +164,7 @@ var connexion = require('./routes/connexion.js');
 var logout = require('./routes/logout.js');
 var cv = require('./routes/CV.js');
 var creerCv = require('./routes/creerCV.js');
+var modifCv = require('./routes/modifCV.js');
 
 //Set page engine to ejs
 app.set('view engine', 'ejs');
@@ -175,6 +176,7 @@ app.use('/connexion', connexion);
 app.use('/logout', logout);
 app.use('/CV', cv);
 app.use('/creerCV', creerCv);
+app.use('/modifCV', modifCv);
 
 //If we got here, it is a 404
 app.use(function(req, res, next){

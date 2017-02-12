@@ -1,0 +1,134 @@
+<%include ./header%>
+            <script type="text/javascript" src=js/addFormField.js></script>
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Modification de votre CV
+                        </h1>
+                        <form method="post">
+                        <p>
+                       	<label>Téléphone</label>
+                        <%if(CV[0].Phone){%>
+                            <input type="nubmer" class="form-control" name="phone" value= <%= CV[0].Phone %> required>
+                        <%}%>
+                        <%if(!CV[0].Phone){%>
+                            <input type="nubmer" class="form-control" name="phone" placeholder="02123456" required>
+                        <%}%>
+                        </p>
+                        <p>
+                        <label>Adresse</label>
+                        <%if(CV[0].Address){%>
+                            <input type="text" class="form-control" name="address" value= "<%= CV[0].Address %>" required>
+                        <%}%>
+                        <%if(!CV[0].Address){%>
+                            <input type="text" class="form-control" name="address" required>
+                        <%}%>
+                        </p>
+                        <label>Date de naissance</label>
+                        <%if(CV[0].Birth){%>
+                            <input type="date" class="form-control" name="birth" value=<%= moment(CV[0].Birth).format("DD-MM-YYYY") %> required>
+                        <%}%>
+                        <%if(!CV[0].Birth){%>
+                            <input type="date" class="form-control" name="birth" placeholder="01-01-2000" required>
+                        <%}%>
+                        </p>
+                        <p>
+                        <label>Formations</label>
+                        <div id=allForm class="form-group input-group">
+                            <%if(!form[0]){%>
+                            <p>
+                            <label>Durée</label></br>
+                            <input type="date" class="form-control" name="ftime" placeholder="01-02-2000 - 01-02-2001">
+                            </p>
+                            <p>
+                            <label>Description</label>
+                            <textarea type="text" class="form-control" name="form"></textarea>
+                            </p>
+                            <%}%>
+                            <%if(form[0]){%>
+                                <%form.forEach(function(el){%>
+                                <div>
+                                    </br><p>
+                                    <label>Durée</label></br>
+                                    <input type="date" class="form-control" name="ftime" value="<%= moment(el.DateStart).format("DD-MM-YYYY")%> - <%= moment(el.DateEnd).format("DD-MM-YYYY")%>">
+                                    </p>
+                                    <p>
+                                    <label>Description</label>
+                                    <textarea type="text" class="form-control" name="form"><%= el.Description%></textarea>
+                                    </p></br>
+                                </div>
+                                <%});%>
+                            <%}%>
+                        </div>
+                        </p>
+                        <p>
+                        <img src="images/plus.png" onclick = 'addFieldF("allForm")'>
+                        <p>
+                        <p>
+                        <label>Expérience professionnelle</label>
+                        <div id=allExp class="form-group input-group">
+                            <%if(!exp[0]){%>
+                            <p>
+                            <label>Durée</label></br>
+                            <input type="date" class="form-control" name="etime" placeholder="01/02/2000 - 01/02/2001">
+                            </p>
+                            <p>
+                            <label>Description</label>
+                            <textarea type="text" class="form-control" name="exp"></textarea>
+                            </p>
+                            <p>
+                            <label>Remarque</label></br>
+                            <input type="text" class="form-control" name="erem">
+                            </p>
+                            <%}%>
+                            <%if(exp[0]){%>
+                                <%exp.forEach(function(el){%>
+                                <div>
+                                    </br><p>
+                                    <label>Durée</label></br>
+                                    <input type="date" class="form-control" name="ftime" value="<%= moment(el.DateStart).format("DD-MM-YYYY") %> - <%= moment(el.DateEnd).format("DD-MM-YYYY")%>">
+                                    </p>
+                                    <p>
+                                    <label>Description</label>
+                                    <textarea type="text" class="form-control" name="form"><%= el.Description%></textarea>
+                                    </p>
+                                    <p>
+                                    <label>Remarque</label></br>
+                                    <input type="text" class="form-control" value = "<%= el.Remarque%>" name="erem">
+                                    </p>
+                                </div> 
+                                <%});%>
+                            <%}%>
+                        </div>
+                        </p>
+                        <p>
+                        <img src="images/plus.png" onclick = 'addFieldE("allExp")'>
+                        <p>
+                        <button type="submit" class="btn btn-default">Valider</button>
+                        </p>
+                        </form>
+                    </div>
+                </div>
+                <!-- /.row -->
+
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

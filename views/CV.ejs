@@ -13,7 +13,7 @@
                             Email : <%= user[0].Email%> </br>
                             Téléphone : <%= CV[0].Phone%> </br>
                             Adresse : <%= CV[0].Address%> </br>
-                            Date de naissance : <%= CV[0].Birth%> </br>
+                            Date de naissance : <%= moment(CV[0].Birth).format("DD-MM-YYYY")%> </br>
                             </p>
                             <p>
                             Formations : </br>
@@ -23,7 +23,7 @@
                             <%if(form.length != 0){%>
                                 <%form.forEach(function(el){%>
                                     De <%=  moment(el.DateStart).format("DD-MM-YYYY") %> à <%= moment(el.DateEnd).format("DD-MM-YYYY") %> </br>
-                                    <%= el.Description %>
+                                    <%= el.Description %> </br>
                                 <%});%>
                             <%}%>
                             </p>
@@ -44,11 +44,11 @@
                                 <%});%>
                             <%}%>
                             </p>
+                            <a href="/modifCV" ><button class="btn btn-default" >Modifier</button></a> <button class="btn btn-default">Exporter en PDF</button>
                         <%}%>
                         <%if(!CV){%>
                             Vous n'avez pas encore entré les informations de votre CV. Cliquez <a href=/creerCV> ici </a> pour en créer un.
                         <%}%>
-                        <button class="btn btn-default">Modifier</button> <button class="btn btn-default">Exporter en PDF</button>
                     </div>
                 </div>
                 <!-- /.row -->
