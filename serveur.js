@@ -181,7 +181,7 @@ app.use('/modifCV', modifCv);
 //If we got here, it is a 404
 app.use(function(req, res, next){
   //res.render('404', {});
-  console.log("404");
+  //console.log("404");
 
 });
 

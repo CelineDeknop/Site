@@ -48,44 +48,55 @@ app.get('/', function(req, res) {
 });
 
 app.post('/', function(req, res, next) {
-	//Get all the variables
-	var phone = req.body.phone;
-	var address = req.body.address;
-	var birthRaw = req.body.birth;
-	var regEx = /[-\.\/]/;
-	var values = birthRaw.split(regEx);
-	var birth;
-	if(values.length == 3){
-		birth = new Date(values[2]+'-'+ values[1] + '-' + values[0]).toISOString().slice(0, 19).replace('T', ' ');
-	}
-	else{
-		//Birthdate invalid
-		res.render('modifCV', {
-			titre:'CV',
-			user:req.user,
-			badbirth:true,
-			previous:[phone, address]
-		});
-		return;
-	}
-	var allFormsDesc = req.body.form;
-	var allFormDate = req.body.ftime;
-	var allExpDesc = req.body.exp;
-	var allExpDate = req.body.etime;
-	var allExpRem = req.body.erem;
 
+    //Get CV variables
+    var phone = req.body.phone;
+    var address = req.body.address;
+    var birthRaw = req.body.birth;
+    var regEx = /[-\.\/]/;
+    var values = birthRaw.split(regEx);
+    var birth;
+    if(values.length == 3){
+        birth = new Date(values[2]+'-'+ values[1] + '-' + values[0]).toISOString().slice(0, 19).replace('T', ' ');
+    }
+    else{
+        //Birthdate invalid
+        res.render('modifCV', {
+            titre:'CV',
+            user:req.user,
+            badbirth:true,
+            previous:[phone, address]
+        });
+        return;
+    }
 	//Do db inserts
 	db.run("BEGIN TRANSACTION");
 	db.run("UPDATE CV SET Phone='"+phone+"', Address='"+address+"', Birth ='"+birth+"' WHERE UserID = "+req.user[0].User_ID , 
-    function callback(){
+    function callback(err){
+        //console.log(err);
     	db.run("END"); //Assured the CV is inserted
     	var request = "SELECT CV_ID FROM CV WHERE UserID = " + req.user[0].User_ID+" ;";
     	db.all(request, function(err, data){
     		db.run("BEGIN TRANSACTION");
-    		var regEx = /[-\.\/]/;
-    		var dateSplit;
-    		var stop;
-    		var desc;
+            //TODO, maybe find something more efficient
+            //First, let's wipe il all out
+            db.run("DELETE FROM FORMATION WHERE CVID = " + data[0].CV_ID + ";", function callback2(err2){
+                db.run("DELETE FROM EXPERIENCE WHERE CVID = " + data[0].CV_ID + ";", function callback3(err3){
+                //console.log(err2);
+                //console.log(err3);
+
+                //Get all the form/exp variables
+                var allFormsDesc = req.body.form;
+                console.log(allFormsDesc)
+                var allFormDate = req.body.ftime;
+                console.log(allFormDate)
+                var allExpDesc = req.body.exp;
+                var allExpDate = req.body.etime;
+                var allExpRem = req.body.erem;
+    		    var regEx = /[-\.\/]/;
+    		    var dateSplit;
+    		    var stop;
+    		    var desc;
     		if(!Array.isArray(allFormsDesc)){ //If it isn't an array, there is just one form
     			stop = 1;
     			desc = allFormsDesc;
@@ -103,10 +114,11 @@ app.post('/', function(req, res, next) {
     				try{//Try to make the date and insert
     					var dateStart = new  Date(dateSplit[2].trim()+'-'+ dateSplit[1].trim() + '-' + dateSplit[0].trim()).toISOString().slice(0, 19).replace('T', ' ');
     					var dateEnd = new  Date(dateSplit[5].trim()+'-'+ dateSplit[4].trim() + '-' + dateSplit[3].trim()).toISOString().slice(0, 19).replace('T', ' ');
-    					db.run("INSERT OR REPLACE INTO FORMATION (CVID, DateStart, DateEnd, Description) VALUES (?,?,?,?)",
+                        db.run("INSERT OR REPLACE INTO FORMATION (CVID, DateStart, DateEnd, Description) VALUES (?,?,?,?)",
                    			[data[0].CV_ID, dateStart, dateEnd, desc]);//Encoded formation
     				}
     				catch(err){
+                        console.log(err)
     					//Date went wrong, just ignore it
     				}
                 }
@@ -145,7 +157,7 @@ app.post('/', function(req, res, next) {
     					//Just ignore that one
     				}
                 }
-    		}
+    		}});});
     		db.run("END", function callback(){ //We have finished with the database
                 res.redirect('/CV');//Redirect to CV page
             });
